@@ -1,0 +1,64 @@
+import index from "../configs/pineconeConfig.js";
+
+
+class VectorDatabaseServices{
+
+    async insertDataService(namespace,data){
+        try{
+          const pc = index.namespace(namespace)
+        
+          await pc.upsertRecords(data)
+
+
+          return {validated:true}
+        }catch(error){
+          return {validated:false, error:error?.message}
+        }
+       
+    }
+
+    async getDataService(namespace="my-namespace"){
+      const pc = index.namespace(namespace)
+      const data = await pc.listPaginated()
+
+      const ids = data.vectors.map(vector => (vector.id))
+
+      const response = await pc.fetch(ids)
+    
+      const metadata = Object.keys(response.records).map(key => ({id:response.records[key].id, data:response.records[key].metadata}))
+      
+      return {validated:true, data:metadata}
+    }
+
+    async searchDataService(namespace,query){
+      try{
+        const pc = index.namespace(namespace)
+
+        const results = await pc.searchRecords({
+            query: {
+              topK: 3,
+              inputs: { text: query },
+            },
+            rerank: {
+              model: 'bge-reranker-v2-m3',
+              topN: 3,
+              rankFields: ['chunk_text'],
+            },
+          });
+          
+        const formatedDocs = results.result.hits.map(hit=> (
+            `category: ${hit.fields.category}, text: ${hit.fields.chunk_text}`
+        ))
+     
+        return {validated:true, data:formatedDocs}
+      }catch(error){
+        return {validated:false, error:error?.message}
+      }  
+          
+    }
+
+ 
+
+}
+
+export default new VectorDatabaseServices()

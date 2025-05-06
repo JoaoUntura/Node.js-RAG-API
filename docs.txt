@@ -1,0 +1,20 @@
+
+
+Criar Index 
+/*await pc.createIndexForModel({
+  name: indexName,
+  cloud: 'aws',
+  region: 'us-east-1',
+  embed: {
+    model: 'llama-text-embed-v2',
+    fieldMap: { text: 'chunk_text' },
+  },
+});*/
+
+
+Formatação entrada novos vetores
+/*const records = [
+    {"_id": "rec1", 
+    "chunk_text": "A EcoTech Soluções Sustentáveis é uma empresa especializada no desenvolvimento de tecnologias voltadas à preservação ambiental.", 
+    "category": "sobre"}
+]
