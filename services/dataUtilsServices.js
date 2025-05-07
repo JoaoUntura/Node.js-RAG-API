@@ -1,5 +1,4 @@
-import fs from "fs"
-import { PDFDocument } from 'pdf-lib';
+
 import axios from "axios";
 import * as cheerio from 'cheerio';
 
@@ -13,11 +12,7 @@ class DataUtilServices{
         return chunks;
       }
       
-      // === Função para processar o PDF ===
-    async processarPdf(pdfPath) {
-      const dataBuffer = fs.readFileSync(pdfPath);
-      return dataBuffer; 
-    }
+ 
     
     async scrapSite(url) {
         const response = await axios.get(url);

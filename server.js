@@ -7,7 +7,7 @@ import setupSocketChat from "./configs/webSocketConfig.js";
 
 const corsOptions = {
   origin: 'http://localhost:3001',
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'DELETE' ],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
 

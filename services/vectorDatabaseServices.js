@@ -7,28 +7,49 @@ class VectorDatabaseServices{
         try{
           const pc = index.namespace(namespace)
         
-          await pc.upsertRecords(data)
+          await pc.upsertRecords([data])
 
 
           return {validated:true}
         }catch(error){
+          console.log(error)
           return {validated:false, error:error?.message}
         }
        
     }
 
-    async getDataService(namespace="my-namespace"){
-      const pc = index.namespace(namespace)
-      const data = await pc.listPaginated()
-
-      const ids = data.vectors.map(vector => (vector.id))
-
-      const response = await pc.fetch(ids)
-    
-      const metadata = Object.keys(response.records).map(key => ({id:response.records[key].id, data:response.records[key].metadata}))
+    async getDataService(namespace){
+      try{
+        const pc = index.namespace(`${namespace}`)
+        const data = await pc.listPaginated({ limit: 100 })
+  
+        const ids = data.vectors.map(vector => (vector.id))
+  
+        const response = await pc.fetch(ids)
       
-      return {validated:true, data:metadata}
+        const metadata = Object.keys(response.records).map(key => ({id:response.records[key].id, data:response.records[key].metadata}))
+        
+        return {validated:true, data:metadata}
+      }catch(error){
+        console.log(error)
+        return {validated:false, error:error?.message}
+      }
+ 
     }
+
+    async deleteDataService(namespace, id){
+      try{
+        const pc = index.namespace(`${namespace}`)
+        const data = await pc.deleteOne(id)
+        
+        return {validated:true}
+      }catch(error){
+        console.log(error)
+        return {validated:false, error:error?.message}
+      }
+ 
+    }
+
 
     async searchDataService(namespace,query){
       try{
