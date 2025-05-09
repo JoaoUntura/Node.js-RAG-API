@@ -31,11 +31,11 @@ export default function setupSocketChat(server){
       });
     
     io.on('connection', (socket) => {
-
-        socket.on('user_message', async ({ userId, message }) => {
+      
+        socket.on('user_message', async ({ userId, message, namespace }) => {
             socket.userId = userId; 
             console.log(userId)
-            const docs = await vectorDatabaseServices.searchDataService("my-namespace", message)
+            const docs = await vectorDatabaseServices.searchDataService(`${namespace}`, message)
 
             if (getMessages(userId).length > 0){
               addMessage(userId, { role: 'user', content: `Seguindo o histórico da conversa. De acordo com esta pergunta do usuário: ${message}. 
@@ -48,7 +48,7 @@ export default function setupSocketChat(server){
            
 
             const history = getMessages(userId)
-      
+            console.log(history)
             // Envia para a IA com o contexto
             const response = await aiServices.generateReply(history);
         

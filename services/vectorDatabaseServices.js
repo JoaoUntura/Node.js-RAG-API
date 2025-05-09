@@ -2,14 +2,37 @@ import index from "../configs/pineconeConfig.js";
 
 
 class VectorDatabaseServices{
+    async createNamespaceService(namespace){
+      try{
+      
+        const pc = index.namespace(namespace)
+
+        await pc.upsertRecords([{id:"temp1", 
+          chunk_text: "Temp Vector", 
+          category: "Temp"}])
+
+        
+        return {validated:true}
+
+      }catch(error){
+        console.log(error)
+        return {validated:false, error:error?.message}
+      }
+   
+      
+    }
 
     async insertDataService(namespace,data){
+     
         try{
-          const pc = index.namespace(namespace)
+          const pc = index.namespace(`${namespace}`)
+          if (Array.isArray(data)){
+            await pc.upsertRecords(data)
+          }else{
+            console.log(data)
+            await pc.upsertRecords([data])
+          }
         
-          await pc.upsertRecords([data])
-
-
           return {validated:true}
         }catch(error){
           console.log(error)

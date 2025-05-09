@@ -5,7 +5,9 @@ import multer from "multer";
 const router = express.Router()
 const upload = multer({ dest: 'uploads/' })
 
+router.post("/newnamespace", vectorDatabaseContoller.createNamespace)
 router.post("/newdata", vectorDatabaseContoller.insertNewData)
+router.post("/newdata/url", vectorDatabaseContoller.insertNewDataURL)
 router.delete("/newdata/:namespace", vectorDatabaseContoller.deleteData)
 router.get("/newdata/:namespace", vectorDatabaseContoller.getData)
 

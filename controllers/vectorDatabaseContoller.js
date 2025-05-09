@@ -1,4 +1,5 @@
 
+import dataUtilsServices from "../services/dataUtilsServices.js"
 import vectorService from "../services/vectorDatabaseServices.js"
 
 
@@ -6,7 +7,7 @@ import vectorService from "../services/vectorDatabaseServices.js"
 class VectorDatabaseController{
 
     async insertNewData(req, res){
-        console.log(req.body)
+      
         let {namespace, data} = req.body
 
         const response = await vectorService.insertDataService(namespace,data)
@@ -15,6 +16,37 @@ class VectorDatabaseController{
         ?res.status(200).json({sucess:true})
         :res.status(400).json({sucess:false, data:response.error})
         
+    }
+
+    async insertNewDataURL(req,res){
+        let {namespace, url, categoria} = req.body
+
+        const text = await dataUtilsServices.scrapSite(url)
+
+        if (text.validated){
+            const records = dataUtilsServices.dividirTextoVetores(url, categoria, text.data)
+            console.log(records)
+            const response = await vectorService.insertDataService(namespace, records)
+
+            response.validated
+            ?res.status(200).json({sucess:true})
+            :res.status(400).json({sucess:false, data:response.error})
+
+        }else{
+            res.status(400).json({sucess:false, data:text.error})
+        }
+        
+    }
+
+    async createNamespace(req, res){
+              
+        let {namespace} = req.body
+
+        const response = await vectorService.createNamespaceService(namespace)
+
+        response.validated
+        ?res.status(200).json({sucess:true})
+        :res.status(400).json({sucess:false, data:response.error})
     }
 
     async getData(req, res){
