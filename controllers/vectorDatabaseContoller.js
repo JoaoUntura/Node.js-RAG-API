@@ -24,12 +24,14 @@ class VectorDatabaseController{
         const text = await dataUtilsServices.scrapSite(url)
 
         if (text.validated){
-            const records = dataUtilsServices.dividirTextoVetores(url, categoria, text.data)
-            console.log(records)
+            const records = dataUtilsServices.dividirTextoVetores(url, categoria, text.data, 500, "url")
+
             const response = await vectorService.insertDataService(namespace, records)
 
+            const returnRecords = records.map(record => ({id:record._id, data: {category:record.category, chunk_text:record.chunk_text, document:record.document, document_order:record.document_order, doc_type:record.doc_type} }))
+
             response.validated
-            ?res.status(200).json({sucess:true})
+            ?res.status(200).json({sucess:true, data:returnRecords})
             :res.status(400).json({sucess:false, data:response.error})
 
         }else{
@@ -37,6 +39,29 @@ class VectorDatabaseController{
         }
         
     }
+
+    async insertNewDataPDF(req,res){
+        
+        let path = req.file.path
+        const name = req.file.originalname;
+        let {namespace, categoria} = req.body
+
+
+        const text = await dataUtilsServices.pdfReader(path)
+        if (text.validated){
+            const records = dataUtilsServices.dividirTextoVetores(name, categoria, text.data, 500, "pdf")
+            const response = await vectorService.insertDataService(namespace, records)
+            const returnRecords = records.map(record => ({id:record._id, data:{category:record.category, chunk_text:record.chunk_text, document:record.document, document_order:record.document_order, doc_type:record.doc_type} }))
+
+            response.validated
+            ?res.status(200).json({sucess:true, data:returnRecords})
+            :res.status(400).json({sucess:false, data:response.error})
+        }else{
+            res.status(400).json({sucess:false, data:text.error})
+        }
+     
+    }
+
 
     async createNamespace(req, res){
               

@@ -39,19 +39,23 @@ export default function setupSocketChat(server){
 
             if (getMessages(userId).length > 0){
               addMessage(userId, { role: 'user', content: `Seguindo o histórico da conversa. De acordo com esta pergunta do usuário: ${message}. 
-              Crie uma resposta, sem se apresentar novamente, para o usuário de acordo com estas informações: ${docs.data}`});
+              Crie uma resposta, sem se apresentar novamente, para o usuário de acordo com estas informações: ${docs.data},
+               Formate este texto de forma legível e organizada para ser exibido em uma interface. 
+              Use títulos, bullets, separações por seção e destaque com emojis se útil`});
             }else{
                addMessage(userId, { role: 'user', content: `Você é um assistente chatbot que ajuda o usuário sobre informações em relação à empresa.
               De acordo com esta pergunta do usuário: ${message}. 
-              Crie uma resposta para o usuário de acordo com estas informações: ${docs.data}`});
+              Crie uma resposta para o usuário de acordo com estas informações: ${docs.data} 
+              Formate este texto de forma legível e organizada para ser exibido em uma interface. 
+              Use títulos, bullets, espaços, separações por seção e destaque com emojis se útil`, });
             }
            
 
             const history = getMessages(userId)
-            console.log(history)
+           
             // Envia para a IA com o contexto
             const response = await aiServices.generateReply(history);
-        
+            console.log(response)
             // Armazena resposta da IA
             addMessage(userId, { role: 'system', content: response });
         

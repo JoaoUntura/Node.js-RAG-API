@@ -29,7 +29,6 @@ class VectorDatabaseServices{
           if (Array.isArray(data)){
             await pc.upsertRecords(data)
           }else{
-            console.log(data)
             await pc.upsertRecords([data])
           }
         
@@ -80,12 +79,12 @@ class VectorDatabaseServices{
 
         const results = await pc.searchRecords({
             query: {
-              topK: 3,
+              topK: 5,
               inputs: { text: query },
             },
             rerank: {
               model: 'bge-reranker-v2-m3',
-              topN: 3,
+              topN: 5,
               rankFields: ['chunk_text'],
             },
           });
