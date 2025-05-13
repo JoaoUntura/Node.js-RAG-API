@@ -3,6 +3,7 @@ import vectorDatabaseContoller from "../controllers/vectorDatabaseContoller.js"
 import userController from "../controllers/userController.js";
 import loginController from "../controllers/loginController.js";
 import multer from "multer";
+import middleware from "../middlewares/auth_middleware.js";
 
 const router = express.Router()
 const upload = multer({ dest: 'uploads/' })
@@ -15,7 +16,7 @@ router.delete("/newdata/:namespace", vectorDatabaseContoller.deleteData)
 router.get("/newdata/:namespace", vectorDatabaseContoller.getData)
 
 router.post("/user", userController.newUser)
-router.get("/user", userController.listAll)
+router.get("/user", middleware, userController.listAll)
 router.delete("/user/:id", userController.deleteUser)
 
 router.post("/login", loginController.login)
