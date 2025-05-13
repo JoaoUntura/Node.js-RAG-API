@@ -1,5 +1,7 @@
 import express from "express"
 import vectorDatabaseContoller from "../controllers/vectorDatabaseContoller.js"
+import userController from "../controllers/userController.js";
+import loginController from "../controllers/loginController.js";
 import multer from "multer";
 
 const router = express.Router()
@@ -12,6 +14,11 @@ router.post("/newdata/pdf", upload.single('pdf'), vectorDatabaseContoller.insert
 router.delete("/newdata/:namespace", vectorDatabaseContoller.deleteData)
 router.get("/newdata/:namespace", vectorDatabaseContoller.getData)
 
+router.post("/user", userController.newUser)
+router.get("/user", userController.listAll)
+router.delete("/user/:id", userController.deleteUser)
+
+router.post("/login", loginController.login)
 
 export default router
 

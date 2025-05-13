@@ -69,6 +69,7 @@ class VectorDatabaseController{
 
         const response = await vectorService.createNamespaceService(namespace)
 
+
         response.validated
         ?res.status(200).json({sucess:true})
         :res.status(400).json({sucess:false, data:response.error})
