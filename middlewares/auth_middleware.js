@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken"
 export default function middleware(req,res,next){
 
     const token = req.cookies.token;
-    console.log(token)
+  
     if(token != undefined){
         try {
             jwt.verify(token,process.env.SECRET)
