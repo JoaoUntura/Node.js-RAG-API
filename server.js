@@ -10,7 +10,18 @@ const app = express()
 app.use(cookieParser()); // ← Aqui
 app.use(express.urlencoded({extended:false}))
 app.use(express.json())
-app.use(cors());
+const allowedOrigins = ['https://front-rag-one.vercel.app', 'http://localhost:3001']; // ajuste aqui
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use('/', router)
 
 const server = createServer(app);
