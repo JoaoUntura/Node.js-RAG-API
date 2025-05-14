@@ -7,11 +7,7 @@ import { createServer } from 'node:http';
 import setupSocketChat from "./configs/webSocketConfig.js";
 
 const app = express()
-app.use(cookieParser()); // ← Aqui
-app.use(express.urlencoded({extended:false}))
-app.use(express.json())
 const allowedOrigins = ['https://front-rag-one.vercel.app', 'http://localhost:3001']; // ajuste aqui
-
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -22,6 +18,10 @@ app.use(cors({
   },
   credentials: true
 }));
+app.use(cookieParser()); // ← Aqui
+app.use(express.urlencoded({extended:false}))
+app.use(express.json())
+
 app.use('/', router)
 
 const server = createServer(app);
