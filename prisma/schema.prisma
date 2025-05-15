@@ -9,12 +9,13 @@ datasource db {
 }
 
 model user {
-  id        Int         @id @default(autoincrement())
-  email     String
-  name      String?
-  password  String?
-  active    Boolean?
-  namespace namespace[]
+  id             Int         @id @default(autoincrement())
+  email          String
+  name           String?
+  password       String?
+  active         Boolean?
+  public_api_key String?
+  namespace      namespace[]
 }
 
 model namespace {

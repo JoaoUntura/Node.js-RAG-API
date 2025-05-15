@@ -10,30 +10,22 @@ class UserControllers{
         :res.status(200).json({success:true, values: result.values})
     }
     
-    async listById(req, res){
-        const id = req.params.id
-        if (isNaN(id)){
-            res.status(406).json({success:false, message: "Id inválido!"})
-        }else{
 
-            let result = await user.findById(id)
-            
-            if(!result.validated){
-                res.status(404).json({success:false, message: result.error})
-            }
+    async verifyPublicApi(req, res){
+        let {apikey} = req.body
+        let result = await user.verifyPublicApiService(apikey)
+        
+        !result.validated
+        ?res.status(404).json({success:false, message: result.error})
+        :res.status(200).json({success:true})
 
-            result.values == undefined
-            ?res.status(406).json({success:true, values: "user não Encontrado"})
-            :res.status(200).json({success:true, values:result.values})
 
-        }
     }
 
     async newUser(req,res){
     
         let {email, name, password} = req.body
         
-        console.log(email, name, password)
 
         let result = await user.create(email, name, authServices.hashPasswordService(password), true)
 

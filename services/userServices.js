@@ -1,4 +1,5 @@
 import prisma from "../configs/prismaConfig.js"
+import authServices from "./authServices.js"
 
  class UserServices{
 
@@ -43,8 +44,29 @@ import prisma from "../configs/prismaConfig.js"
     async create(email, name, password, active){
        
         try{
-            await prisma.user.create({data:{email:email, name:name, password:password, active:active}})
+            const user = await prisma.user.create({data:{email:email, name:name, password:password, active:active}})
+         
+            await prisma.user.update({where:{id:user.id}, data:{public_api_key:authServices.generateApiKey(user.id)}})
             return {validated:true}
+        }catch(error){
+            return {validated: false, error: error}
+        }
+    }
+
+    async verifyPublicApiService(apikey){
+       
+        try{
+            const payload = authServices.verifyApiKey(apikey)
+
+            const user = await prisma.user.findUnique({where:{id:parseInt(payload.userid)}})
+
+            if (user && user.active){
+                return {validated: true}
+            }else{
+                return {validated: false, error: "User não ativo"}
+            }
+            
+          
         }catch(error){
             return {validated: false, error: error}
         }

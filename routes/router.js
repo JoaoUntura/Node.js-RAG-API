@@ -8,7 +8,7 @@ import middleware from "../middlewares/auth_middleware.js";
 const router = express.Router()
 const upload = multer({ dest: 'uploads/' })
 
-router.post("/newnamespace", vectorDatabaseContoller.createNamespace)
+router.post("/newnamespace", middleware, vectorDatabaseContoller.createNamespace)
 router.post("/newdata", middleware, vectorDatabaseContoller.insertNewData)
 router.post("/newdata/url", middleware,vectorDatabaseContoller.insertNewDataURL)
 router.post("/newdata/pdf", middleware, upload.single('pdf'), vectorDatabaseContoller.insertNewDataPDF)
@@ -17,9 +17,10 @@ router.get("/newdata",middleware, vectorDatabaseContoller.getData)
 
 router.post("/user", userController.newUser)
 router.get("/user", middleware, userController.listAll)
-router.delete("/user/:id", userController.deleteUser)
+router.delete("/user/:id", middleware, userController.deleteUser)
 
 router.post("/login", loginController.login)
+router.post("/verify/publicapi", userController.verifyPublicApi)
 
 export default router
 
