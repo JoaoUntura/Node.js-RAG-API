@@ -34,7 +34,7 @@ export default function setupSocketChat(server){
       
         socket.on('user_message', async ({ userId, message, namespace }) => {
             socket.userId = userId; 
-            console.log(userId)
+          
             const docs = await vectorDatabaseServices.searchDataService(`${namespace}`, message)
 
             if (getMessages(userId).length > 0){
@@ -55,7 +55,7 @@ export default function setupSocketChat(server){
            
             // Envia para a IA com o contexto
             const response = await aiServices.generateReply(history);
-            console.log(response)
+           
             // Armazena resposta da IA
             addMessage(userId, { role: 'system', content: response });
         

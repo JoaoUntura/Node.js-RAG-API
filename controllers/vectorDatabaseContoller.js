@@ -1,5 +1,6 @@
 
 import dataUtilsServices from "../services/dataUtilsServices.js"
+import userServices from "../services/userServices.js"
 import vectorService from "../services/vectorDatabaseServices.js"
 
 
@@ -8,9 +9,9 @@ class VectorDatabaseController{
 
     async insertNewData(req, res){
       
-        let {namespace, data} = req.body
-
-        const response = await vectorService.insertDataService(namespace,data)
+        let {data} = req.body
+        const namespace = await userServices.findNameSpaceByUserId(req.userid)
+        const response = await vectorService.insertDataService(namespace.values.name,data)
 
         response.validated
         ?res.status(200).json({sucess:true})
@@ -19,14 +20,14 @@ class VectorDatabaseController{
     }
 
     async insertNewDataURL(req,res){
-        let {namespace, url, categoria} = req.body
-
+        let {url, categoria} = req.body
+        const namespace = await userServices.findNameSpaceByUserId(req.userid)
         const text = await dataUtilsServices.scrapSite(url)
 
         if (text.validated){
             const records = dataUtilsServices.dividirTextoVetores(url, categoria, text.data, 500, "url")
 
-            const response = await vectorService.insertDataService(namespace, records)
+            const response = await vectorService.insertDataService(namespace.values.name, records)
 
             const returnRecords = records.map(record => ({id:record._id, data: {category:record.category, chunk_text:record.chunk_text, document:record.document, document_order:record.document_order, doc_type:record.doc_type} }))
 
@@ -44,13 +45,14 @@ class VectorDatabaseController{
         
         let path = req.file.path
         const name = req.file.originalname;
-        let {namespace, categoria} = req.body
+        let {categoria} = req.body
+        const namespace = await userServices.findNameSpaceByUserId(req.userid)
 
 
         const text = await dataUtilsServices.pdfReader(path)
         if (text.validated){
             const records = dataUtilsServices.dividirTextoVetores(name, categoria, text.data, 500, "pdf")
-            const response = await vectorService.insertDataService(namespace, records)
+            const response = await vectorService.insertDataService(namespace.values.name, records)
             const returnRecords = records.map(record => ({id:record._id, data:{category:record.category, chunk_text:record.chunk_text, document:record.document, document_order:record.document_order, doc_type:record.doc_type} }))
 
             response.validated
@@ -69,16 +71,16 @@ class VectorDatabaseController{
 
         const response = await vectorService.createNamespaceService(namespace)
 
-
         response.validated
         ?res.status(200).json({sucess:true})
         :res.status(400).json({sucess:false, data:response.error})
     }
 
     async getData(req, res){
-        const namespace = req.params.namespace
-      
-        const response = await vectorService.getDataService(namespace)
+        const namespace = await userServices.findNameSpaceByUserId(req.userid)
+        
+
+        const response = await vectorService.getDataService(namespace.values.name)
         
         response.validated
         ?res.status(200).json({sucess:true, data:response.data})
@@ -87,9 +89,9 @@ class VectorDatabaseController{
     }
 
     async deleteData(req, res){
-        const namespace = req.params.namespace
+        const namespace = await userServices.findNameSpaceByUserId(req.userid)
         let {id} = req.body
-        const response = await vectorService.deleteDataService(namespace,id)
+        const response = await vectorService.deleteDataService(namespace.values.name,id)
         
         response.validated
         ?res.status(200).json({sucess:true})

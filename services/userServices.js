@@ -12,11 +12,12 @@ import prisma from "../configs/prismaConfig.js"
            }
 
 
-    async findById(id){
+    async findNameSpaceByUserId(id){
         try{
 
-            const user = await prisma.user.findUnique({where:{id:parseInt(id)}})
-           console.log(user)
+            const user = await prisma.namespace.findFirst({where:{user_id:parseInt(id)}, select:{name:true}})
+            
+    
             return user
             ?{validated:true, values:user}
             :{validated:true, values:undefined}
