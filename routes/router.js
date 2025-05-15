@@ -15,8 +15,8 @@ router.post("/newdata/pdf", middleware, upload.single('pdf'), vectorDatabaseCont
 router.delete("/newdata", middleware, vectorDatabaseContoller.deleteData)
 router.get("/newdata",middleware, vectorDatabaseContoller.getData)
 
-router.post("/user", userController.newUser)
-router.get("/user", middleware, userController.listAll)
+router.post("/user",middleware, userController.newUser)
+router.get("/user", middleware, userController.listById)
 router.delete("/user/:id", middleware, userController.deleteUser)
 
 router.post("/login", loginController.login)

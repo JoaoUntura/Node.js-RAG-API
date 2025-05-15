@@ -3,10 +3,11 @@ import authServices from "./authServices.js"
 
  class UserServices{
 
-    async findAll(){
+    async findById(userid){
         try {
-            const users = await prisma.user.findMany()
-            return {validated: true, values:users}
+            const user = await prisma.user.findUnique({where:{id:userid}, select:{name:true, public_api_key:true}})
+            const namespaces = await prisma.namespace.findMany({where:{user_id:parseInt(userid)}, select:{name:true}})
+            return {validated: true, values:{user:user, namespaces:namespaces}}
         } catch (error) {
             return {validated: false, error: error}
         }

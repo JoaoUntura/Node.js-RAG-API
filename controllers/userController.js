@@ -3,11 +3,14 @@ import authServices from "../services/authServices.js"
 
 class UserControllers{
 
-    async listAll(req,res){
-        let result = await user.findAll()
+    async listById(req,res){
+        let id = parseInt(req.userid)
+
+        let result = await user.findById(id)
+
         !result.validated
         ?res.status(404).json({success:false, message: result.error})
-        :res.status(200).json({success:true, values: result.values})
+        :res.status(200).json({success:true, data: result.values})
     }
     
 
