@@ -1,5 +1,6 @@
 import user from "../services/userServices.js"
 import authServices from "../services/authServices.js"
+import vectorDatabaseServices from "../services/vectorDatabaseServices.js"
 
 class UserControllers{
 
@@ -31,6 +32,8 @@ class UserControllers{
         
 
         let result = await user.create(email, name, authServices.hashPasswordService(password), true)
+        const userid = result.data
+        let namespace = await vectorDatabaseServices.createNamespaceService(`namespace_user${userid}`,userid)
 
         result.validated
         ?res.status(201).json({success:true, message:"User criado com successo!"})

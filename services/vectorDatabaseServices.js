@@ -1,16 +1,17 @@
 import index from "../configs/pineconeConfig.js";
-
+import prisma from "../configs/prismaConfig.js";
 
 class VectorDatabaseServices{
-    async createNamespaceService(namespace){
+    async createNamespaceService(namespace, userid){
       try{
       
         const pc = index.namespace(namespace)
 
-        await pc.upsertRecords([{id:"temp1", 
-          chunk_text: "Temp Vector", 
+        await pc.upsertRecords([{id:"temp", 
+          chunk_text: "Ignore this info", 
           category: "Temp"}])
 
+        await prisma.namespace.create({data:{name:namespace, user_id:userid}})
         
         return {validated:true}
 
@@ -45,7 +46,7 @@ class VectorDatabaseServices{
         const pc = index.namespace(`${namespace}`)
         const data = await pc.listPaginated({ limit: 100 })
   
-        const ids = data.vectors.map(vector => (vector.id))
+        const ids = data.vectors.map(vector => (vector.id !== 'temp' && vector.id ))
   
         const response = await pc.fetch(ids)
       
