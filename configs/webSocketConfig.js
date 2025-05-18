@@ -40,14 +40,14 @@ export default function setupSocketChat(server){
             if (getMessages(userId).length > 0){
               addMessage(userId, { role: 'user', content: `Seguindo o histórico da conversa. De acordo com esta pergunta do usuário: ${message}. 
               Crie uma resposta, sem se apresentar novamente, para o usuário de acordo com estas informações: ${docs.data},
-               Formate este texto de forma legível e organizada para ser exibido em uma interface. 
-              Use títulos, bullets, separações por seção e destaque com emojis se útil`});
+              Formate este texto de forma organizada para ser exibido em uma interface. 
+              Use títulos, bullets, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil`});
             }else{
                addMessage(userId, { role: 'user', content: `Você é um assistente chatbot que ajuda o usuário sobre informações em relação à empresa.
               De acordo com esta pergunta do usuário: ${message}. 
               Crie uma resposta para o usuário de acordo com estas informações: ${docs.data} 
-              Formate este texto de forma legível e organizada para ser exibido em uma interface. 
-              Use títulos, bullets, espaços, separações por seção e destaque com emojis se útil`, });
+              Formate este texto de forma legível para ser exibido em uma interface. 
+              Use títulos, bullets, espaços, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil`, });
             }
            
 
