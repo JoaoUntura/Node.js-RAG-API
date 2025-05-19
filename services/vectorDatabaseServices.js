@@ -63,7 +63,13 @@ class VectorDatabaseServices{
     async deleteDataService(namespace, id){
       try{
         const pc = index.namespace(`${namespace}`)
-        const data = await pc.deleteOne(id)
+
+        if (Array.isArray(id)){
+            await pc.deleteMany(id)
+        }else{
+          await pc.deleteOne(id)
+        }
+      
         
         return {validated:true}
       }catch(error){
