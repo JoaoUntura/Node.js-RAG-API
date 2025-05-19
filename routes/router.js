@@ -13,7 +13,7 @@ router.post("/newdata", middleware, vectorDatabaseContoller.insertNewData)
 router.post("/newdata/url", middleware,vectorDatabaseContoller.insertNewDataURL)
 router.post("/newdata/pdf", middleware, upload.single('pdf'), vectorDatabaseContoller.insertNewDataPDF)
 router.delete("/newdata", middleware, vectorDatabaseContoller.deleteData)
-router.get("/newdata",middleware, vectorDatabaseContoller.getData)
+router.get("/newdata/:pagtoken", middleware, vectorDatabaseContoller.getData)
 
 router.post("/user",middleware, userController.newUser)
 router.get("/user", middleware, userController.listById)

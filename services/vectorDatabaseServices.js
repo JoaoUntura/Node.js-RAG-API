@@ -41,10 +41,17 @@ class VectorDatabaseServices{
        
     }
 
-    async getDataService(namespace){
+    async getDataService(namespace, pagTokenUser){
       try{
+
         const pc = index.namespace(`${namespace}`)
-        const data = await pc.listPaginated({ limit: 100 })
+
+    
+        const data = pagTokenUser ? await pc.listPaginated({ limit: 50, paginationToken:pagTokenUser }) 
+        : await pc.listPaginated({ limit: 50 })
+      
+  
+        const paginationToken = data?.pagination?.next
   
         const ids = data.vectors.map(vector => (vector.id !== 'temp' && vector.id ))
   
@@ -52,7 +59,8 @@ class VectorDatabaseServices{
       
         const metadata = Object.keys(response.records).map(key => ({id:response.records[key].id, data:response.records[key].metadata}))
         
-        return {validated:true, data:metadata}
+        return {validated:true, data:{vectors:metadata, paginationToken:paginationToken}}
+
       }catch(error){
         console.log(error)
         return {validated:false, error:error?.message}
@@ -86,7 +94,7 @@ class VectorDatabaseServices{
 
         const results = await pc.searchRecords({
             query: {
-              topK: 5,
+              topK: 10,
               inputs: { text: query },
             },
             rerank: {

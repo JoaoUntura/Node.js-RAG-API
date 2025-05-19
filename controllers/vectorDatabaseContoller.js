@@ -78,9 +78,10 @@ class VectorDatabaseController{
 
     async getData(req, res){
         const namespace = await userServices.findNameSpaceByUserId(req.userid)
-        
 
-        const response = await vectorService.getDataService(namespace.values.name)
+        const paginationToken = req.params.pagtoken == '0' ? null : req.params.pagtoken
+
+        const response = await vectorService.getDataService(namespace.values.name, paginationToken)
         
         response.validated
         ?res.status(200).json({sucess:true, data:response.data})
