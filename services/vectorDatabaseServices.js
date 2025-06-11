@@ -16,7 +16,7 @@ class VectorDatabaseServices{
         return {validated:true}
 
       }catch(error){
-        console.log(error)
+     
         return {validated:false, error:error?.message}
       }
    

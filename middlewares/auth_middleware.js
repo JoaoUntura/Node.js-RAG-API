@@ -4,12 +4,12 @@ import jwt from "jsonwebtoken"
 
 //iniciar a middleware
 export default function middleware(req,res,next){
-    const auth = req.headers['authorization']
-    
-    if(auth != undefined){
+    res.setHeader('Access-Control-Allow-Origin', process.env.FRONT_END_URL);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    let token = req?.cookies?.token
+
+    if(token){
         try {
-            const bearer = auth.split(' ')
-            let token = bearer[1]
             let payload = jwt.verify(token,process.env.SECRET)
             
             req.userid = payload.userid

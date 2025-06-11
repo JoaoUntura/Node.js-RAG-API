@@ -4,6 +4,7 @@ import userController from "../controllers/userController.js";
 import loginController from "../controllers/loginController.js";
 import multer from "multer";
 import middleware from "../middlewares/auth_middleware.js";
+import loginMiddleware from "../middlewares/login_middleware.js";
 
 const router = express.Router()
 const upload = multer({ dest: 'uploads/' })
@@ -19,7 +20,7 @@ router.post("/user",middleware, userController.newUser)
 router.get("/user", middleware, userController.listById)
 router.delete("/user/:id", middleware, userController.deleteUser)
 
-router.post("/login", loginController.login)
+router.post("/login", loginMiddleware, loginController.login)
 router.post("/verify/publicapi", userController.verifyPublicApi)
 
 export default router

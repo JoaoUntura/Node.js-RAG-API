@@ -17,9 +17,16 @@ class LoginController{
             if(!passValiated){
                res.status(406).json({success: false, message:"Senha Invalida"})
             }else{
-                let token = jwt.sign({userid: user.values.id},process.env.SECRET,{expiresIn:100000}) 
               
-                res.status(200).json({success: true, token:token})
+                let token = jwt.sign({userid: user.values.id},process.env.SECRET,{expiresIn:100000}) 
+                res.cookie('token', token, {
+                    httpOnly: true, // protege contra acesso via JavaScript no client
+                    secure: false,  // true em produção com HTTPS
+                    sameSite: 'lax', // ou 'strict' ou 'none' se for cross-site
+                    maxAge: 24 * 60 * 60 * 1000 // 1 dia
+                  });
+              
+                res.status(200).json({success: true})
             }
         }else{
             user.values == undefined

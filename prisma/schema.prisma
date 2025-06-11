@@ -19,8 +19,8 @@ model user {
 }
 
 model namespace {
-  id      Int     @id @default(autoincrement())
-  name    String?
-  user_id Int?
-  user    user?   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id      Int    @id @default(autoincrement())
+  name    String @unique
+  user_id Int
+  user    user   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

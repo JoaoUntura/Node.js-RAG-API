@@ -23,6 +23,6 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
-    "debug":"nodemon server.js"
+    "debug": "nodemon server.js"
   }
 }

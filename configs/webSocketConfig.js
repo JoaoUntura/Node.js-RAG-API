@@ -12,11 +12,11 @@ function addMessage(userId, message) {
 
   userMessages.push(message);
 
-  if (userMessages.length > 10) {
+  if (userMessages.length > 5) {
     userMessages.shift();
   }
 
-  context.set(userId, userMessages); // atualiza o Map (não obrigatório nesse caso)
+  context.set(userId, userMessages); 
 }
 
 function getMessages(userId) {
@@ -52,7 +52,8 @@ export default function setupSocketChat(server){
            
 
             const history = getMessages(userId)
-           
+            
+        
             // Envia para a IA com o contexto
             const response = await aiServices.generateReply(history);
            
@@ -66,7 +67,6 @@ export default function setupSocketChat(server){
         socket.on('disconnect', () => {
           if (socket.userId) {
             context.delete(socket.userId);
-            console.log(`🧹 Contexto limpo para o userId: ${socket.userId}`);
           }
         });
 

@@ -73,6 +73,24 @@ import authServices from "./authServices.js"
         }
     }
 
+    async verifyNameSpace(namespace){
+       
+        try{
+    
+            const user = await prisma.user.findUnique({where:{id:parseInt(payload.userid), namespace:namespace}})
+
+            if (user && user.active){
+                return {validated: true}
+            }else{
+                return {validated: false, error: "User não ativo"}
+            }
+            
+          
+        }catch(error){
+            return {validated: false, error: error}
+        }
+    }
+
     async update(id, name, email){
 
         let user = await this.findById(id)
