@@ -23,6 +23,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
+    "build": "prisma generate",
     "debug": "nodemon server.js"
   }
 }

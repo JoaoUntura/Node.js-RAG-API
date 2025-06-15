@@ -73,12 +73,12 @@ import authServices from "./authServices.js"
         }
     }
 
-    async verifyNameSpace(namespace){
+    async verifyNameSpace(userid, namespace){
        
         try{
     
-            const user = await prisma.user.findUnique({where:{id:parseInt(payload.userid), namespace:namespace}})
-
+            const {user} = await prisma.namespace.findUnique({where:{user_id:parseInt(userid), name:namespace}, select:{user:{select:{active:true}}}})
+ 
             if (user && user.active){
                 return {validated: true}
             }else{
@@ -87,6 +87,7 @@ import authServices from "./authServices.js"
             
           
         }catch(error){
+            console.log(error)
             return {validated: false, error: error}
         }
     }
