@@ -22,9 +22,7 @@ const server = createServer(app);
 setupSocketChat(server)
 
 
-server.listen(3000, () => {
-
-    console.log("Rodando API")
-
-})
+server.listen(3000, '0.0.0.0', () => {
+  console.log("Rodando API na porta 3000")
+});
 
