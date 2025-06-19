@@ -10,6 +10,8 @@ const router = express.Router()
 const upload = multer({ dest: 'uploads/' })
 
 router.post("/newnamespace", middleware, vectorDatabaseContoller.createNamespace)
+
+
 router.post("/newdata/:namespace", middleware, vectorDatabaseContoller.insertNewData)
 router.post("/newdata/url/:namespace", middleware,vectorDatabaseContoller.insertNewDataURL)
 router.post("/newdata/pdf/:namespace", middleware, upload.single('pdf'), vectorDatabaseContoller.insertNewDataPDF)

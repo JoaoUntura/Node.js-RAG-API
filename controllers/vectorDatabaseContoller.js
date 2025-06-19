@@ -118,7 +118,10 @@ class VectorDatabaseController {
   async createNamespace(req, res) {
     let { namespace } = req.body;
 
-    const response = await vectorService.createNamespaceService(namespace);
+    const response = await vectorService.createNamespaceService(
+      namespace,
+      req.userid
+    );
 
     response.validated
       ? res.status(200).json({ sucess: true })
@@ -126,7 +129,8 @@ class VectorDatabaseController {
   }
 
   async getData(req, res) {
-    const namespace = req.params.namespace;
+    const namespace = `${req.params.namespace}`;
+    
     const valitadion = await userServices.verifyNameSpace(
       req.userid,
       namespace
@@ -149,6 +153,7 @@ class VectorDatabaseController {
       : res.status(400).json({ sucess: false, data: response.error });
   }
 
+
   async deleteData(req, res) {
     const namespace = req.params.namespace;
     const valitadion = await userServices.verifyNameSpace(
@@ -160,10 +165,7 @@ class VectorDatabaseController {
       return;
     }
     let { id } = req.body;
-    const response = await vectorService.deleteDataService(
-      namespace,
-      id
-    );
+    const response = await vectorService.deleteDataService(namespace, id);
 
     response.validated
       ? res.status(200).json({ sucess: true })
