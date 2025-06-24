@@ -2,23 +2,7 @@ import index from "../configs/pineconeConfig.js";
 import prisma from "../configs/prismaConfig.js";
 
 class VectorDatabaseServices {
-  async createNamespaceService(namespace, userid) {
-    try {
-      const pc = index.namespace(namespace);
 
-      await pc.upsertRecords([
-        { id: "temp", chunk_text: "Ignore this info", category: "Temp" },
-      ]);
-
-      await prisma.namespace.create({
-        data: { name: namespace, user_id: userid },
-      });
-
-      return { validated: true };
-    } catch (error) {
-      return { validated: false, error: error?.message };
-    }
-  }
 
   async insertDataService(namespace, data) {
     try {
@@ -87,7 +71,7 @@ class VectorDatabaseServices {
   async searchDataService(namespace, query) {
     try {
       const pc = index.namespace(namespace);
-      console.time("tempoExecucaoDocs");
+    
       const results = await pc.searchRecords({
         query: {
           topK: 10,
@@ -95,18 +79,19 @@ class VectorDatabaseServices {
         },
         rerank: {
           model: "bge-reranker-v2-m3",
-          topN: 2,
+          topN: 3,
           rankFields: ["chunk_text"],
         },
       });
-      console.timeEnd("tempoExecucaoDocs");
+
+
       const formatedDocs = results.result.hits.map(
         (hit) => (`category: ${hit.fields.category}, text: ${hit.fields.chunk_text}`)
       );
 
-      console.log("Resultados encontrados:", formatedDocs.length, "docs")
-
-      return { validated: true, data: formatedDocs };
+      const ids = results.result.hits.map((hit) => hit._id);
+  
+      return { validated: true, data: {docs:formatedDocs, ids:ids} };
     } catch (error) {
       return { validated: false, error: error?.message };
     }

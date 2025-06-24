@@ -1,9 +1,12 @@
 import { Server } from "socket.io";
 import vectorDatabaseServices from "../services/vectorDatabaseServices.js";
+import userServices from "../services/userServices.js";
 import aiServices from "../services/aiServices.js";
+import conversationsServices from "../services/conversationsServices.js";
+
 const context = new Map();
 
-function addMessage(userId, message) {
+async function addMessage(conversationId, userId, message) {
 
   if (!context.has(userId)) {
     context.set(userId, []);
@@ -18,7 +21,11 @@ function addMessage(userId, message) {
     userMessages.shift();
   }
 
-  context.set(userId, userMessages); 
+  context.set(userId, userMessages);
+
+  if (conversationId) {
+    await conversationsServices.addMessageService(conversationId, message);
+  }
 }
 
 function getMessages(userId) {
@@ -33,40 +40,65 @@ export default function setupSocketChat(server){
       });
     
     io.on('connection', (socket) => {
-      
+
+        let conversationId;
+        let pre_prompt;
+
         socket.on('user_message', async ({ userId, message, namespace }) => {
-            socket.userId = userId; 
-            console.time("tempoExecucaoGeral");
-            const docs = await vectorDatabaseServices.searchDataService(`${namespace}`, message)
 
-            if (getMessages(userId).length > 0){
-              addMessage(userId, { role: 'user', content: `Seguindo o histórico da conversa. De acordo com esta pergunta do usuário: ${message}. 
-              Crie uma resposta, sem se apresentar novamente, para o usuário de acordo com estas informações: ${docs.data},
-              mantendo o contexto da conversa.`});
-            }else{
-              addMessage(userId, { role: 'user', content: `Você é um assistente chatbot que ajuda o usuário sobre informações em relação à empresa.
-              De acordo com esta pergunta do usuário: ${message}. 
-              Crie uma resposta para o usuário de acordo com estas informações: ${docs.data} 
-              Não Invente informações. Formate este texto de forma legível para ser exibido em uma interface. 
-              Use títulos, bullets, espaços, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil`, });
-            }
+            if (!socket.userId || !socket.namespace) {
 
-            const history = getMessages(userId)
+            socket.namespace = namespace; // Armazena o namespace na conexão do socket
+            socket.userId = userId; // Armazena o userId na conexão do socket
             
-            // Envia para a IA com o contexto
-            const response = await aiServices.generateReply(history);
+            const response = await userServices.findNameSpaceByName(`${namespace}`);
+      
+
+            if (!response.validated || !response.values) {
+                socket.emit('error', 'Namespace não encontrado ou inválido.');
+                return;
+            }
+            console.log(pre_prompt)
+            pre_prompt = response.values.pre_prompt || "Você é um assistente chatbot que ajuda o usuário sobre informações em relação à empresa";
+
+          }
+
+            console.time("tempoExecucaoGeral");
+
+            const responseDocs = await vectorDatabaseServices.searchDataService(`${namespace}`, message)
+
+            const docsText = responseDocs.data.docs.join(", ");
+
+            let newMessageInstructions;
            
-            // Armazena resposta da IA
-            addMessage(userId, { role: 'system', content: response });
-        
+            if (getMessages(userId).length > 0){
+              newMessageInstructions =  { role: 'user', content: `${pre_prompt}. Seguindo o histórico da conversa. De acordo com esta pergunta do usuário: ${message}. Crie uma resposta para o usuário, não invente informações, mantendo o contexto da conversa. Use títulos, bullets, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil para o usuário de acordo com estas informações: ${docsText}.`};
+            }else{
+              const response = await conversationsServices.createConversationService(userId, namespace);
+              conversationId = response.validated ? response.values : null;
+              newMessageInstructions = { role: 'user', content: `${pre_prompt}. De acordo com esta pergunta do usuário: ${message}.Crie uma resposta para o usuário, não invente informações, mantendo o contexto da conversa. Use títulos, bullets, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil para o usuário de acordo com estas informações: ${docsText}.` };
+            }
+            
+            const history = getMessages(userId)
+
+            // Envia para a IA com o contexto
+            const response = await aiServices.generateReply([...history, newMessageInstructions]);
+
             // Envia para o frontend
             socket.emit('bot_reply', response);
+
+            // Armazena respostas
+            addMessage(conversationId, userId, { role: 'user', content: message });
+            addMessage(conversationId, userId, { role: 'assistant', content: response });
+              
             console.timeEnd("tempoExecucaoGeral");
+     
           });
 
         socket.on('disconnect', () => {
           if (socket.userId) {
             context.delete(socket.userId);
+            
           }
         });
 

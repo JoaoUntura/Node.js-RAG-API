@@ -30,6 +30,7 @@ class DataUtilServices {
   }
 
   async scrapSite(url) {
+    
     try {
       const response = await axios.get(url, { timeout: 15000 });
       const $ = cheerio.load(response.data);
@@ -61,7 +62,7 @@ class DataUtilServices {
             .replace(/^\s+|\s+$/g, "")
         
       }
-      console.log(finalText)
+
       return { validated: true, data: finalText};
     } catch (error) {
       return { validated: false, error: error };

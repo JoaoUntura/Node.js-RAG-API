@@ -9,18 +9,39 @@ datasource db {
 }
 
 model user {
-  id             Int         @id @default(autoincrement())
+  id             Int             @id @default(autoincrement())
   email          String
   name           String?
   password       String?
   active         Boolean?
   public_api_key String?
+  conversations  conversations[]
   namespace      namespace[]
 }
 
 model namespace {
-  id      Int    @id @default(autoincrement())
-  name    String @unique
-  user_id Int
-  user    user   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  id                                               Int             @id @default(autoincrement())
+  name                                             String          @unique
+  user_id                                          Int
+  pre_prompt                                       String?
+  conversations_conversations_namespaceTonamespace conversations[] @relation("conversations_namespaceTonamespace")
+  user                                             user            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model conversations {
+  id                                           Int        @id @default(autoincrement())
+  date                                         DateTime   @db.Timestamptz(6)
+  user_id                                      Int?
+  client_id                                    String?
+  namespace                                    String?
+  namespace_conversations_namespaceTonamespace namespace? @relation("conversations_namespaceTonamespace", fields: [namespace], references: [name], onDelete: Cascade)
+  user                                         user?      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  messages                                     messages[]
+}
+
+model messages {
+  id              Int            @id @default(autoincrement())
+  conversation_id Int?
+  content         Json?          @db.Json
+  conversations   conversations? @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
 }

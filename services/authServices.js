@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken"
 import dotenv from 'dotenv'
 dotenv.config()
+
 class AuthServices{
     hashPasswordService(password){
         let salt = bcrypt.genSaltSync(10)

@@ -5,9 +5,9 @@ dotenv.config()
 class Ai{
     async generateReply(history){
         try{
-         
+    
           console.time("tempoExecucaoAI");
-
+          console.log("Histórico enviado para a IA:", history);
           const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -25,7 +25,7 @@ class Ai{
        
         const data = await response.json();
 
-
+    
         console.timeEnd("tempoExecucaoAI");
     
         return data.choices[0].message.content

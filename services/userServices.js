@@ -6,7 +6,7 @@ import authServices from "./authServices.js"
     async findById(userid){
         try {
             const user = await prisma.user.findUnique({where:{id:userid}, select:{name:true, public_api_key:true}})
-            const namespaces = await prisma.namespace.findMany({where:{user_id:parseInt(userid)}, select:{name:true}})
+            const namespaces = await prisma.namespace.findMany({where:{user_id:parseInt(userid)}, select:{id:true, name:true, pre_prompt:true}})
             return {validated: true, values:{user:user, namespaces:namespaces}}
         } catch (error) {
             return {validated: false, error: error}
@@ -14,15 +14,30 @@ import authServices from "./authServices.js"
            }
 
 
-    async findNameSpaceByUserId(id){
+    async findUserIdByNamespace(name){
         try{
 
-            const user = await prisma.namespace.findFirst({where:{user_id:parseInt(id)}, select:{name:true}})
+            const user = await prisma.namespace.findFirst({where:{name:name}, select:{user_id:true}})
             
     
             return user
-            ?{validated:true, values:user}
+            ?{validated:true, values:user.user_id}
             :{validated:true, values:undefined}
+
+        }catch(error){
+            return {validated: false, error: error}
+        }
+    }
+
+    async findNameSpaceByName(name){
+        try{
+
+            const namespace = await prisma.namespace.findFirst({where:{name:name}, select:{name:true, pre_prompt:true}})
+            
+    
+            return namespace
+            ?{validated:true, values:namespace}
+            :{validated:false, values:undefined}
 
         }catch(error){
             return {validated: false, error: error}
