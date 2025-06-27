@@ -73,10 +73,12 @@ class VectorDatabaseController {
    
     let { categoria } = req.body;
     const namespace = req.params.namespace;
+
     const valitadion = await userServices.verifyNameSpace(
       req.userid,
-      namespace
+      `${namespace}`
     );
+
     if (!valitadion.validated) {
       res.status(400).json({ sucess: false, data: valitadion.error });
       return;
@@ -85,15 +87,18 @@ class VectorDatabaseController {
     let returnRecords = [];
 
     for (const file of req.files) {
-      let path = file.path;
+   
+      const path = file.path;
       const name = file.originalname;
-      const text = await dataUtilsServices.pdfReader(path);
-
-      if (text.validated) {
+      const mimitype = file.mimetype;
+   
+      const text = await dataUtilsServices.fileReader(path, mimitype);
+  
+      if (!text?.error) {
         let records = dataUtilsServices.dividirTextoVetores(
           name,
           categoria,
-          text.data,
+          text,
           500,
           "pdf"
         );
@@ -126,8 +131,6 @@ class VectorDatabaseController {
       }
     }
 
-    res.status(200).json({ sucess: true, data: returnRecords });
-
     req.files.forEach((file) => {
       fs.unlink(file.path, (err) => {
         if (err) {
@@ -135,6 +138,8 @@ class VectorDatabaseController {
         }
       });
     })
+
+    res.status(200).json({ sucess: true, data: returnRecords });
    
   }
 

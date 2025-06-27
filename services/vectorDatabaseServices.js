@@ -8,7 +8,10 @@ class VectorDatabaseServices {
     try {
       const pc = index.namespace(`${namespace}`);
       if (Array.isArray(data)) {
-        await pc.upsertRecords(data);
+        const batches = this.chunkArray(data, 96);
+        for (const batch of batches) {
+        await pc.upsertRecords(batch);
+      }
       } else {
         await pc.upsertRecords([data]);
       }
@@ -74,7 +77,7 @@ class VectorDatabaseServices {
     
       const results = await pc.searchRecords({
         query: {
-          topK: 10,
+          topK: 6,
           inputs: { text: query },
         },
         rerank: {
@@ -96,6 +99,16 @@ class VectorDatabaseServices {
       return { validated: false, error: error?.message };
     }
   }
+
+  chunkArray(array, size) {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += size) {
+      chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+  }
 }
+
+
 
 export default new VectorDatabaseServices();

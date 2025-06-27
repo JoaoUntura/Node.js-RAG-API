@@ -10,4 +10,5 @@ const indexName = 'my-index';
 
 const index = pc.index(indexName)
 
+
 export default index
