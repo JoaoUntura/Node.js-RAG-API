@@ -29,20 +29,7 @@ import authServices from "./authServices.js"
         }
     }
 
-    async findNameSpaceByName(name){
-        try{
-
-            const namespace = await prisma.namespace.findFirst({where:{name:name}, select:{name:true, pre_prompt:true}})
-            
-    
-            return namespace
-            ?{validated:true, values:namespace}
-            :{validated:false, values:undefined}
-
-        }catch(error){
-            return {validated: false, error: error}
-        }
-    }
+ 
 
     async findByEmail(email){
         try{

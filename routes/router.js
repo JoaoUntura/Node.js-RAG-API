@@ -12,8 +12,11 @@ const router = express.Router()
 const upload = multer({ dest: 'uploads/' })
 
 //cria bot
+
 router.post("/newnamespace", middleware, namespaceController.createNamespace)
 router.put("/namespace/:id", middleware, namespaceController.updateNamespace)
+router.get("/namespace/:name", middleware, namespaceController.getNamespace)
+router.delete("/namespace/:id", middleware, namespaceController.deleteNamespace)
 
 
 //conversas e mensagens

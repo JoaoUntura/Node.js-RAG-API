@@ -3,11 +3,10 @@ import dotenv from "dotenv"
 dotenv.config()
 
 class Ai{
-    async generateReply(history){
+    async generateReply(history, ) {
         try{
     
-          console.time("tempoExecucaoAI");
-          console.log("Histórico enviado para a IA:", history);
+         
           const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -16,19 +15,22 @@ class Ai{
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              "model": "meta-llama/llama-4-maverick:free",
-              "messages": history
+              transforms: ["middle-out"],
+              "models": ["meta-llama/llama-4-maverick:free","deepseek/deepseek-chat-v3-0324:free","deepseek/deepseek-r1-0528:free"],
+              "messages": history,
+            
             })
           });
 
-
+        
        
         const data = await response.json();
-
-    
-        console.timeEnd("tempoExecucaoAI");
-    
-        return data.choices[0].message.content
+   
+          
+        const message = data.choices[0].message.content;
+     
+        return message === '' ? 'Desculpe, não consegui entender sua pergunta. Pode reformular?' : message;
+     
         }catch(error){
           console.log(error)
         }

@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import vectorDatabaseServices from "../services/vectorDatabaseServices.js";
-import userServices from "../services/userServices.js";
+import namespacesServices from "../services/namespacesServices.js";
+
 import aiServices from "../services/aiServices.js";
 import conversationsServices from "../services/conversationsServices.js";
 
@@ -41,25 +42,21 @@ export default function setupSocketChat(server){
     
     io.on('connection', (socket) => {
 
-        let conversationId;
-        let pre_prompt;
 
         socket.on('user_message', async ({ userId, message, namespace }) => {
 
-            if (!socket.userId || !socket.namespace) {
+          if (!socket.userId || !socket.namespace ) {
 
             socket.namespace = namespace; // Armazena o namespace na conexão do socket
             socket.userId = userId; // Armazena o userId na conexão do socket
             
-            const response = await userServices.findNameSpaceByName(`${namespace}`);
+            const response = await namespacesServices.findNameSpaceByName(`${namespace}`);
       
-
             if (!response.validated || !response.values) {
                 socket.emit('error', 'Namespace não encontrado ou inválido.');
                 return;
             }
-            console.log(pre_prompt)
-            pre_prompt = response.values.pre_prompt || "Você é um assistente chatbot que ajuda o usuário sobre informações em relação à empresa";
+            socket.pre_prompt = response.values.pre_prompt || "Você é um assistente chatbot que ajuda o usuário sobre informações em relação à empresa";
 
           }
 
@@ -72,11 +69,11 @@ export default function setupSocketChat(server){
             let newMessageInstructions;
            
             if (getMessages(userId).length > 0){
-              newMessageInstructions =  { role: 'user', content: `${pre_prompt}. Seguindo o histórico da conversa. De acordo com esta pergunta do usuário: ${message}. Crie uma resposta para o usuário, não invente informações, mantendo o contexto da conversa. Use títulos, bullets, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil para o usuário de acordo com estas informações: ${docsText}.`};
+              newMessageInstructions =  { role: 'user', content: `${socket.pre_prompt}. Seguindo o histórico da conversa. De acordo com esta pergunta do usuário: ${message}. Crie uma resposta para o usuário, não invente informações, mantendo o contexto da conversa. Use títulos, bullets, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil para o usuário de acordo com estas informações: ${docsText}.`};
             }else{
               const response = await conversationsServices.createConversationService(userId, namespace);
-              conversationId = response.validated ? response.values : null;
-              newMessageInstructions = { role: 'user', content: `${pre_prompt}. De acordo com esta pergunta do usuário: ${message}.Crie uma resposta para o usuário, não invente informações, mantendo o contexto da conversa. Use títulos, bullets, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil para o usuário de acordo com estas informações: ${docsText}.` };
+              socket.conversationId = response.validated ? response.values : null;
+              newMessageInstructions = { role: 'user', content: `${socket.pre_prompt}. De acordo com esta pergunta do usuário: ${message}.Crie uma resposta para o usuário, não invente informações, mantendo o contexto da conversa. Use títulos, bullets, separações por seção, espaçamento entre paragrafos com "\n" e destaque com emojis se útil para o usuário de acordo com estas informações: ${docsText}.` };
             }
             
             const history = getMessages(userId)
@@ -88,8 +85,8 @@ export default function setupSocketChat(server){
             socket.emit('bot_reply', response);
 
             // Armazena respostas
-            addMessage(conversationId, userId, { role: 'user', content: message });
-            addMessage(conversationId, userId, { role: 'assistant', content: response });
+            addMessage(socket.conversationId, userId, { role: 'user', content: message });
+            addMessage(socket.conversationId, userId, { role: 'assistant', content: response });
               
             console.timeEnd("tempoExecucaoGeral");
      

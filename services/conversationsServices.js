@@ -63,7 +63,7 @@ class CoversationsServices {
     try {
       const messages = await prisma.messages.findMany({
         where: { conversation_id: parseInt(conversationId), conversations: { user_id: parseInt(userId) } },
-        orderBy: { id: 'asc' },
+        orderBy: { created_at: 'asc' },
       });
       return { validated: true, values: messages };
     } catch (error) {
