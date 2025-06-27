@@ -16,7 +16,7 @@ class Ai{
             },
             body: JSON.stringify({
               transforms: ["middle-out"],
-              "models": ["meta-llama/llama-4-maverick:free","deepseek/deepseek-chat-v3-0324:free","deepseek/deepseek-r1-0528:free"],
+              "models": ["deepseek/deepseek-chat-v3-0324:free","deepseek/deepseek-r1-0528:free", "meta-llama/llama-4-maverick:free"],
               "messages": history,
             
             })
