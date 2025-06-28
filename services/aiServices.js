@@ -16,7 +16,7 @@ class Ai{
             },
             body: JSON.stringify({
               transforms: ["middle-out"],
-              "models": ["deepseek/deepseek-chat-v3-0324:free","deepseek/deepseek-r1-0528:free", "meta-llama/llama-4-maverick:free"],
+              "models": ["nousresearch/deephermes-3-llama-3-8b-preview:free", "deepseek/deepseek-r1-distill-llama-70b:free"],
               "messages": history,
             
             })
@@ -25,8 +25,9 @@ class Ai{
         
        
         const data = await response.json();
-   
           
+        console.log(data)
+        
         const message = data.choices[0].message.content;
      
         return message === '' ? 'Desculpe, não consegui entender sua pergunta. Pode reformular?' : message;
